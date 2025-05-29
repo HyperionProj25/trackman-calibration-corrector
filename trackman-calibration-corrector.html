@@ -742,6 +742,12 @@
 
         // Store previous values for percentage comparison
         let previousValues = {
+            setupDistance: 13,
+            actualDistance: 25,
+            setupHeight: 8.5,
+            actualHeight: 9,
+            setupSide: 2.5,
+            actualSide: -3.5,
             distanceChange: 12.0,
             heightScale: 1.082,
             sideScale: 0.982
@@ -826,9 +832,17 @@
             // Calculate dynamic correction factors based on user's setup vs reference
             const distanceScaling = referenceDistanceRatio !== 0 ? distanceRatio / referenceDistanceRatio : 0;
 
-            // Interpolate/extrapolate correction factors based on setup differences
-            const heightScaleAdjustment = 1 + (distanceScaling - 1) * 0.5; // Moderate scaling with distance
-            const sideScaleAdjustment = 1 + (distanceScaling - 1) * 0.3;   // Less scaling for side measurements
+            // Calculate correction factors based on individual parameter changes
+
+            // Height correction: influenced by both distance and height changes
+            const heightDistanceEffect = (distanceScaling - 1) * 0.3; // Reduced distance influence
+            const heightDirectEffect = heightDifference * 0.02; // Direct height influence
+            const heightScaleAdjustment = 1 + heightDistanceEffect + heightDirectEffect;
+
+            // Side correction: influenced by both distance and side changes
+            const sideDistanceEffect = (distanceScaling - 1) * 0.2; // Reduced distance influence
+            const sideDirectEffect = sideDifference * 0.01; // Direct side influence
+            const sideScaleAdjustment = 1 + sideDistanceEffect + sideDirectEffect;
 
             const correctionFactors = {
                 height: {
@@ -848,12 +862,21 @@
             const heightScale = correctionFactors.height.scale;
             const sideScale = correctionFactors.side.scale;
 
-            // Calculate percentage changes from previous values
-            const distanceChangePercent = previousValues.distanceChange !== 0 ?
+            // Calculate percentage changes for each parameter independently
+
+            // Distance parameter changes (affects Setup Change)
+            const distanceParamChanged = (setupDistance !== previousValues.setupDistance) || (actualDistance !== previousValues.actualDistance);
+            const distanceChangePercent = distanceParamChanged && previousValues.distanceChange !== 0 ?
                 ((distanceChange - previousValues.distanceChange) / Math.abs(previousValues.distanceChange) * 100) : 0;
-            const heightScalePercent = previousValues.heightScale !== 0 ?
+
+            // Height parameter changes (affects Height Correction)
+            const heightParamChanged = (setupHeight !== previousValues.setupHeight) || (actualHeight !== previousValues.actualHeight);
+            const heightScalePercent = heightParamChanged && previousValues.heightScale !== 0 ?
                 ((heightScale - previousValues.heightScale) / previousValues.heightScale * 100) : 0;
-            const sideScalePercent = previousValues.sideScale !== 0 ?
+
+            // Side parameter changes (affects Side Correction)
+            const sideParamChanged = (setupSide !== previousValues.setupSide) || (actualSide !== previousValues.actualSide);
+            const sideScalePercent = sideParamChanged && previousValues.sideScale !== 0 ?
                 ((sideScale - previousValues.sideScale) / previousValues.sideScale * 100) : 0;
 
             // Format percentage indicators
@@ -875,6 +898,12 @@
 
             // Store current values as previous for next comparison
             previousValues = {
+                setupDistance: setupDistance,
+                actualDistance: actualDistance,
+                setupHeight: setupHeight,
+                actualHeight: actualHeight,
+                setupSide: setupSide,
+                actualSide: actualSide,
                 distanceChange: distanceChange,
                 heightScale: heightScale,
                 sideScale: sideScale
