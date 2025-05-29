@@ -89,11 +89,20 @@
         }
 
         .grid-3 {
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(3, 1fr);
         }
 
         .grid-2 {
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        @media (max-width: 1024px) {
+            .grid-3 {
+                grid-template-columns: 1fr;
+            }
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
         }
 
         .input-group {
@@ -194,8 +203,14 @@
 
         .summary-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(3, 1fr);
             gap: 16px;
+        }
+
+        @media (max-width: 768px) {
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
         }
 
         .summary-card {
@@ -736,7 +751,28 @@
         document.addEventListener('DOMContentLoaded', function() {
             updateAdjustmentSummary();
             setupDragAndDrop();
+            setupInputListeners();
         });
+
+        // Setup input listeners for real-time updates
+        function setupInputListeners() {
+            const inputIds = ['setupDistance', 'actualDistance', 'setupSide', 'actualSide', 'setupHeight', 'actualHeight'];
+
+            inputIds.forEach(id => {
+                const input = document.getElementById(id);
+                if (input) {
+                    // Update on input change
+                    input.addEventListener('input', function() {
+                        // Small delay to avoid too many updates while typing
+                        clearTimeout(input.updateTimer);
+                        input.updateTimer = setTimeout(updateAdjustmentSummary, 300);
+                    });
+
+                    // Also update on blur (when user leaves the field)
+                    input.addEventListener('blur', updateAdjustmentSummary);
+                }
+            });
+        }
 
         // Reset all parameters and clear data
         function resetAll() {
@@ -822,18 +858,19 @@
 
             // Format percentage indicators
             const formatPercent = (percent) => {
-                if (Math.abs(percent) < 0.01) return '';
+                if (Math.abs(percent) < 0.1) return '';
                 const sign = percent >= 0 ? '+' : '';
-                return ` (${sign}${percent.toFixed(1)}%)`;
+                const color = percent >= 0 ? 'color: #059669;' : 'color: #dc2626;';
+                return ` <span style="${color} font-size: 0.9em;">(${sign}${percent.toFixed(1)}%)</span>`;
             };
 
             // Update summary display with percentage changes
-            document.getElementById('distanceChange').textContent =
+            document.getElementById('distanceChange').innerHTML =
                 (distanceChange >= 0 ? '+' : '') + distanceChange.toFixed(1) + 'ft' + formatPercent(distanceChangePercent);
             document.getElementById('distanceDesc').textContent = setupDistance + 'ft → ' + actualDistance + 'ft';
-            document.getElementById('heightScale').textContent =
+            document.getElementById('heightScale').innerHTML =
                 heightScale.toFixed(3) + 'x' + formatPercent(heightScalePercent);
-            document.getElementById('sideScale').textContent =
+            document.getElementById('sideScale').innerHTML =
                 sideScale.toFixed(3) + 'x' + formatPercent(sideScalePercent);
 
             // Store current values as previous for next comparison
