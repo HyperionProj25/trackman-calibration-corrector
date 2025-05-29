@@ -1,13 +1,13 @@
 import type { Route } from "./+types/home";
-import { Welcome } from "../welcome/welcome";
+import { TrackManCalibrationCorrector } from "../components/TrackManCalibrationCorrector";
 
 export function meta({}: Route.MetaArgs) {
   return [
-    { title: "New React Router App" },
-    { name: "description", content: "Welcome to React Router!" },
+    { title: "TrackMan CSV Calibration Corrector" },
+    { name: "description", content: "Correct TrackMan baseball radar data when physical setup differs from calibrated parameters" },
   ];
 }
 
 export default function Home() {
-  return <Welcome />;
+  return <TrackManCalibrationCorrector />;
 }

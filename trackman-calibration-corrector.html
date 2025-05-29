@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TrackMan CSV Calibration Corrector</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f9fafb;
+            color: #111827;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .title {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #111827;
+            margin: 0 16px;
+        }
+
+        .reset-btn {
+            display: flex;
+            align-items: center;
+            padding: 8px 16px;
+            background-color: #f3f4f6;
+            color: #374151;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            font-size: 14px;
+        }
+
+        .reset-btn:hover {
+            background-color: #e5e7eb;
+        }
+
+        .description {
+            color: #6b7280;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .section {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 24px;
+        }
+
+        .grid {
+            display: grid;
+            gap: 24px;
+        }
+
+        .grid-3 {
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        }
+
+        .grid-2 {
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        .input-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 4px;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+            color: #000;
+            background: white;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .input-field:invalid {
+            border-color: #ef4444;
+        }
+
+        .input-field:invalid:focus {
+            border-color: #ef4444;
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+        }
+
+        .input-help {
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 4px;
+        }
+
+        .category-title {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #374151;
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 8px;
+            margin-bottom: 16px;
+        }
+
+        .summary-section {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .summary-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .summary-title-group {
+            display: flex;
+            align-items: center;
+        }
+
+        .summary-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1e40af;
+            margin-left: 8px;
+        }
+
+        .summary-refresh-btn {
+            display: flex;
+            align-items: center;
+            padding: 6px 12px;
+            background-color: #f3f4f6;
+            color: #374151;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            font-size: 14px;
+        }
+
+        .summary-refresh-btn:hover {
+            background-color: #e5e7eb;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        .summary-card {
+            background: white;
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .summary-card-title {
+            font-weight: 500;
+            color: #111827;
+            margin-bottom: 8px;
+        }
+
+        .summary-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #3b82f6;
+            margin-bottom: 4px;
+        }
+
+        .summary-desc {
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        .summary-note {
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 8px;
+        }
+
+        .formula-box {
+            margin-top: 16px;
+            padding: 12px;
+            background: #dbeafe;
+            border-radius: 8px;
+        }
+
+        .formula-text {
+            font-size: 14px;
+            color: #1e40af;
+        }
+
+        .formula-subtext {
+            font-size: 12px;
+            color: #1d4ed8;
+            margin-top: 4px;
+        }
+
+        .upload-area {
+            border: 2px dashed #d1d5db;
+            border-radius: 12px;
+            padding: 32px;
+            text-align: center;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .upload-area:hover, .upload-area.dragover {
+            border-color: #3b82f6;
+            background-color: #eff6ff;
+        }
+
+        .upload-icon {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 16px;
+            color: #9ca3af;
+        }
+
+        .upload-title {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #111827;
+            margin-bottom: 8px;
+        }
+
+        .upload-desc {
+            color: #6b7280;
+            margin-bottom: 16px;
+        }
+
+        .upload-btn {
+            padding: 12px 24px;
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.2s;
+        }
+
+        .upload-btn:hover {
+            background-color: #2563eb;
+        }
+
+        .upload-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .calculate-btn {
+            background-color: #059669 !important;
+        }
+
+        .calculate-btn:hover {
+            background-color: #047857 !important;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .status-message {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 16px;
+        }
+
+        .status-success {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            color: #166534;
+        }
+
+        .status-error {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #dc2626;
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .results-title {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #111827;
+        }
+
+        .copy-btn {
+            display: flex;
+            align-items: center;
+            padding: 8px 16px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            background: #f9fafb;
+            color: #374151;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: #f3f4f6;
+        }
+
+        .copy-btn.copied {
+            background: #f0fdf4;
+            border-color: #bbf7d0;
+            color: #166534;
+        }
+
+        .results-textarea {
+            width: 100%;
+            height: 200px;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            color: #000;
+            background: white;
+            resize: none;
+        }
+
+        .results-textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .results-count {
+            font-size: 14px;
+            color: #6b7280;
+            margin-top: 8px;
+        }
+
+        .instructions {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: 24px;
+            margin-top: 48px;
+        }
+
+        .info-box {
+            padding: 16px;
+            border-radius: 8px;
+            margin: 16px 0;
+        }
+
+        .info-box.success {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+        }
+
+        .info-box.warning {
+            background: #fffbeb;
+            border: 1px solid #fed7aa;
+        }
+
+        .info-box-title {
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .info-box.success .info-box-title {
+            color: #166534;
+        }
+
+        .info-box.warning .info-box-title {
+            color: #92400e;
+        }
+
+        .info-box-text {
+            font-size: 14px;
+        }
+
+        .info-box.success .info-box-text {
+            color: #166534;
+        }
+
+        .info-box.warning .info-box-text {
+            color: #92400e;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 16px;
+            }
+
+            .title {
+                font-size: 1.5rem;
+            }
+
+            .header-content {
+                flex-direction: column;
+            }
+
+            .grid-3, .grid-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-content">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                    <path d="M9 9h6v6h-6z"/>
+                </svg>
+                <h1 class="title">TrackMan CSV Calibration Corrector</h1>
+                <button class="reset-btn" onclick="resetAll()" title="Reset all parameters and clear data">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 8px;">
+                        <polyline points="23 4 23 10 17 10"/>
+                        <polyline points="1 20 1 14 7 14"/>
+                        <path d="m3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+                    </svg>
+                    Reset
+                </button>
+            </div>
+            <p class="description">
+                Correct TrackMan baseball radar data when the physical setup doesn't match the calibrated parameters.
+                Adjust for differences in distance, lateral position, and height.
+            </p>
+        </div>
+
+        <!-- Calibration Parameters -->
+        <div class="section">
+            <h2 class="section-title">Calibration Parameters</h2>
+            <div class="grid grid-3">
+                <!-- Distance Parameters -->
+                <div>
+                    <h3 class="category-title">Distance (feet)</h3>
+                    <div class="input-group">
+                        <label for="setupDistance" class="input-label">Setup Distance *</label>
+                        <input type="text" id="setupDistance" class="input-field" value="13" placeholder="13" required>
+                        <p class="input-help">Original calibrated distance from home plate</p>
+                    </div>
+                    <div class="input-group">
+                        <label for="actualDistance" class="input-label">Actual Distance *</label>
+                        <input type="text" id="actualDistance" class="input-field" value="25" placeholder="25" required>
+                        <p class="input-help">Real distance during data collection</p>
+                    </div>
+                </div>
+
+                <!-- Side Position Parameters -->
+                <div>
+                    <h3 class="category-title">Side Position (feet)</h3>
+                    <div class="input-group">
+                        <label for="setupSide" class="input-label">Setup Side Position *</label>
+                        <input type="text" id="setupSide" class="input-field" value="2.5" placeholder="2.5" required>
+                        <p class="input-help">Original calibrated lateral offset (+ = right)</p>
+                    </div>
+                    <div class="input-group">
+                        <label for="actualSide" class="input-label">Actual Side Position *</label>
+                        <input type="text" id="actualSide" class="input-field" value="-3.5" placeholder="-3.5" required>
+                        <p class="input-help">Real lateral position during collection (+ = right)</p>
+                    </div>
+                </div>
+
+                <!-- Height Parameters -->
+                <div>
+                    <h3 class="category-title">Height (feet)</h3>
+                    <div class="input-group">
+                        <label for="setupHeight" class="input-label">Setup Height *</label>
+                        <input type="text" id="setupHeight" class="input-field" value="8.5" placeholder="8.5" required>
+                        <p class="input-help">Original calibrated height</p>
+                    </div>
+                    <div class="input-group">
+                        <label for="actualHeight" class="input-label">Actual Height *</label>
+                        <input type="text" id="actualHeight" class="input-field" value="9" placeholder="9" required>
+                        <p class="input-help">Real height during collection</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Calculate Button -->
+            <div style="text-align: center; margin-top: 24px;">
+                <button id="calculateBtn" class="upload-btn calculate-btn" onclick="calculateAdjustment()" style="font-size: 16px; padding: 12px 32px;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 8px;">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                        <path d="M9 9h6v6h-6z"/>
+                    </svg>
+                    Calculate Adjustment
+                </button>
+            </div>
+        </div>
+
+        <!-- Adjustment Summary -->
+        <div class="summary-section">
+            <div class="summary-header">
+                <div class="summary-title-group">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="m9 12 2 2 4-4"/>
+                    </svg>
+                    <h3 class="summary-title">Adjustment Summary</h3>
+                </div>
+                <button class="summary-refresh-btn" onclick="refreshSummaryWithFeedback()" title="Refresh adjustment summary">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 6px;">
+                        <polyline points="23 4 23 10 17 10"/>
+                        <polyline points="1 20 1 14 7 14"/>
+                        <path d="m3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+                    </svg>
+                    Refresh
+                </button>
+            </div>
+            <div class="summary-grid">
+                <div class="summary-card">
+                    <h4 class="summary-card-title">Setup Change</h4>
+                    <div class="summary-value" id="distanceChange">+12.0ft</div>
+                    <p class="summary-desc" id="distanceDesc">13ft → 25ft</p>
+                    <p class="summary-note">Distance difference from calibration</p>
+                </div>
+                <div class="summary-card">
+                    <h4 class="summary-card-title">Height Correction</h4>
+                    <div class="summary-value" id="heightScale">1.082x</div>
+                    <p class="summary-desc">Statistical scale factor</p>
+                    <p class="summary-note">Distribution matching correction</p>
+                </div>
+                <div class="summary-card">
+                    <h4 class="summary-card-title">Side Correction</h4>
+                    <div class="summary-value" id="sideScale">0.982x</div>
+                    <p class="summary-desc">Statistical scale factor</p>
+                    <p class="summary-note">Distribution matching correction</p>
+                </div>
+            </div>
+            <div class="formula-box">
+                <p class="formula-text"><strong>Statistical Correction Formula:</strong> Corrected Value = (Original - MiscalAvg) × Scale + CorrectAvg</p>
+                <p class="formula-subtext">Uses distribution matching instead of geometric scaling. Correction factors adjust based on your setup parameters.</p>
+            </div>
+        </div>
+
+        <!-- CSV File Upload -->
+        <div class="section">
+            <h2 class="section-title">CSV File Upload</h2>
+            <div class="upload-area" id="uploadArea" onclick="document.getElementById('csvFile').click()">
+                <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                <h3 class="upload-title">Drop your TrackMan CSV file here</h3>
+                <p class="upload-desc">or click to browse and select a file</p>
+                <button class="upload-btn" id="uploadBtn">Select CSV File</button>
+            </div>
+            <input type="file" id="csvFile" class="file-input" accept=".csv" onchange="handleFileUpload(event)">
+
+            <div id="fileStatus" class="hidden"></div>
+
+            <div style="margin-top: 16px; font-size: 14px; color: #6b7280;">
+                <p><strong>Requirements:</strong></p>
+                <ul style="list-style-type: disc; margin-left: 20px; margin-top: 8px;">
+                    <li>CSV file format</li>
+                    <li>Must contain columns with "PlateLocHeight" and "PlateLocSide" in their names</li>
+                    <li>First row should contain column headers</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Results Display -->
+        <div id="resultsSection" class="section hidden">
+            <h2 class="section-title">Corrected Results</h2>
+            <div class="grid grid-2">
+                <!-- Corrected Heights -->
+                <div>
+                    <div class="results-header">
+                        <h3 class="results-title">Corrected Heights</h3>
+                        <button class="copy-btn" id="copyHeightsBtn" onclick="copyToClipboard('correctedHeights', 'copyHeightsBtn')">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 8px;">
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                            </svg>
+                            Copy
+                        </button>
+                    </div>
+                    <textarea id="correctedHeights" class="results-textarea" readonly placeholder="Corrected height values will appear here..."></textarea>
+                    <p class="results-count" id="heightCount">0 values</p>
+                </div>
+
+                <!-- Corrected Sides -->
+                <div>
+                    <div class="results-header">
+                        <h3 class="results-title">Corrected Sides</h3>
+                        <button class="copy-btn" id="copySidesBtn" onclick="copyToClipboard('correctedSides', 'copySidesBtn')">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 8px;">
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                            </svg>
+                            Copy
+                        </button>
+                    </div>
+                    <textarea id="correctedSides" class="results-textarea" readonly placeholder="Corrected side values will appear here..."></textarea>
+                    <p class="results-count" id="sideCount">0 values</p>
+                </div>
+            </div>
+
+            <div style="margin-top: 24px; padding: 16px; background: #f9fafb; border-radius: 8px;">
+                <h4 style="font-weight: 500; color: #111827; margin-bottom: 8px;">Usage Instructions</h4>
+                <div style="font-size: 14px; color: #6b7280;">
+                    <p>• Copy the corrected values using the buttons above</p>
+                    <p>• Paste them into your analysis software or spreadsheet</p>
+                    <p>• Each line represents one data point from your original CSV</p>
+                    <p>• Empty values in the original data remain empty in the results</p>
+                    <p>• Non-numeric values are preserved unchanged</p>
+                </div>
+            </div>
+
+            <div style="margin-top: 16px; padding: 12px; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px;">
+                <p style="font-size: 14px; color: #1e40af;">
+                    <strong>Data Summary:</strong> <span id="dataSummary">Processed 0 rows with 6 decimal precision.</span>
+                    Values are formatted for direct use in analysis tools.
+                </p>
+            </div>
+        </div>
+
+        <!-- Instructions -->
+        <div class="instructions">
+            <h3 class="section-title">Instructions & Method</h3>
+            <div style="color: #6b7280;">
+                <p style="margin-bottom: 12px;"><strong>1. Set Your Calibration Parameters:</strong> Enter your actual setup vs calibrated values. The tool dynamically calculates corrections based on YOUR specific setup differences.</p>
+                <p style="margin-bottom: 12px;"><strong>2. Upload CSV File:</strong> Select a TrackMan CSV file containing PlateLocHeight and PlateLocSide columns.</p>
+                <p style="margin-bottom: 12px;"><strong>3. Dynamic Statistical Correction:</strong> The tool interpolates correction factors based on your setup parameters using reference calibration data.</p>
+                <p style="margin-bottom: 12px;"><strong>4. Copy Results:</strong> Use the copy buttons to get the corrected values for your analysis.</p>
+
+                <div class="info-box success">
+                    <div class="info-box-title">✅ Dynamic Calibration</div>
+                    <div class="info-box-text">
+                        This tool now <strong>uses your actual setup parameters</strong> to calculate appropriate correction factors.
+                        It interpolates/extrapolates from reference data (13ft→25ft baseline) to match your specific setup scenario.
+                        The correction factors adjust automatically as you change your parameters.
+                    </div>
+                </div>
+
+                <div class="info-box warning">
+                    <div class="info-box-title">🔬 Scientific Method</div>
+                    <div class="info-box-text">
+                        Uses <strong>statistical distribution matching</strong> instead of geometric scaling.
+                        Reference factors from real TrackMan calibration studies are scaled based on your distance ratio,
+                        height differences, and lateral position changes.
+                    </div>
+                </div>
+
+                <p style="font-size: 14px; color: #6b7280; margin-top: 16px;">
+                    <strong>Reference Baseline:</strong> 13ft→25ft distance change with statistical factors (Height: 1.082x, Side: 0.982x).
+                    Your specific setup parameters modify these factors proportionally.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let csvData = [];
+        let correctedHeights = '';
+        let correctedSides = '';
+
+        // Store previous values for percentage comparison
+        let previousValues = {
+            distanceChange: 12.0,
+            heightScale: 1.082,
+            sideScale: 0.982
+        };
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            updateAdjustmentSummary();
+            setupDragAndDrop();
+        });
+
+        // Reset all parameters and clear data
+        function resetAll() {
+            document.getElementById('setupDistance').value = 13;
+            document.getElementById('actualDistance').value = 25;
+            document.getElementById('setupSide').value = 2.5;
+            document.getElementById('actualSide').value = -3.5;
+            document.getElementById('setupHeight').value = 8.5;
+            document.getElementById('actualHeight').value = 9;
+
+            csvData = [];
+            correctedHeights = '';
+            correctedSides = '';
+
+            document.getElementById('correctedHeights').value = '';
+            document.getElementById('correctedSides').value = '';
+            document.getElementById('resultsSection').classList.add('hidden');
+            document.getElementById('fileStatus').classList.add('hidden');
+
+            updateAdjustmentSummary();
+        }
+
+        // Update adjustment summary when parameters change (real-time)
+        function updateAdjustmentSummary() {
+            const setupDistance = parseFloat(document.getElementById('setupDistance').value) || 0;
+            const actualDistance = parseFloat(document.getElementById('actualDistance').value) || 0;
+            const setupSide = parseFloat(document.getElementById('setupSide').value) || 0;
+            const actualSide = parseFloat(document.getElementById('actualSide').value) || 0;
+            const setupHeight = parseFloat(document.getElementById('setupHeight').value) || 0;
+            const actualHeight = parseFloat(document.getElementById('actualHeight').value) || 0;
+
+            // Debug: Log the values to console
+            console.log('Updating summary with values:', {
+                setupDistance, actualDistance, setupSide, actualSide, setupHeight, actualHeight
+            });
+
+            // Calculate dynamic correction factors
+            const distanceRatio = setupDistance !== 0 ? actualDistance / setupDistance : 0;
+            const heightDifference = actualHeight - setupHeight;
+            const sideDifference = actualSide - setupSide;
+
+            // Reference case: 13ft → 25ft (ratio 1.923), height +0.5ft, side -6ft
+            const referenceDistanceRatio = 25 / 13; // 1.923
+
+            // Reference correction factors from the 13ft→25ft calibration study
+            const referenceFactors = {
+                height: { scale: 1.082, avgCorrect: 2.317, avgMiscal: 2.415 },
+                side: { scale: 0.982, avgCorrect: 0.058, avgMiscal: -0.125 }
+            };
+
+            // Calculate dynamic correction factors based on user's setup vs reference
+            const distanceScaling = referenceDistanceRatio !== 0 ? distanceRatio / referenceDistanceRatio : 0;
+
+            // Interpolate/extrapolate correction factors based on setup differences
+            const heightScaleAdjustment = 1 + (distanceScaling - 1) * 0.5; // Moderate scaling with distance
+            const sideScaleAdjustment = 1 + (distanceScaling - 1) * 0.3;   // Less scaling for side measurements
+
+            const correctionFactors = {
+                height: {
+                    scale: referenceFactors.height.scale * heightScaleAdjustment,
+                    avgCorrect: referenceFactors.height.avgCorrect + (heightDifference * 0.1),
+                    avgMiscal: referenceFactors.height.avgMiscal + (heightDifference * 0.1)
+                },
+                side: {
+                    scale: referenceFactors.side.scale * sideScaleAdjustment,
+                    avgCorrect: referenceFactors.side.avgCorrect + (sideDifference * 0.05),
+                    avgMiscal: referenceFactors.side.avgMiscal + (sideDifference * 0.05)
+                }
+            };
+
+            // Calculate current values
+            const distanceChange = actualDistance - setupDistance;
+            const heightScale = correctionFactors.height.scale;
+            const sideScale = correctionFactors.side.scale;
+
+            // Calculate percentage changes from previous values
+            const distanceChangePercent = previousValues.distanceChange !== 0 ?
+                ((distanceChange - previousValues.distanceChange) / Math.abs(previousValues.distanceChange) * 100) : 0;
+            const heightScalePercent = previousValues.heightScale !== 0 ?
+                ((heightScale - previousValues.heightScale) / previousValues.heightScale * 100) : 0;
+            const sideScalePercent = previousValues.sideScale !== 0 ?
+                ((sideScale - previousValues.sideScale) / previousValues.sideScale * 100) : 0;
+
+            // Format percentage indicators
+            const formatPercent = (percent) => {
+                if (Math.abs(percent) < 0.01) return '';
+                const sign = percent >= 0 ? '+' : '';
+                return ` (${sign}${percent.toFixed(1)}%)`;
+            };
+
+            // Update summary display with percentage changes
+            document.getElementById('distanceChange').textContent =
+                (distanceChange >= 0 ? '+' : '') + distanceChange.toFixed(1) + 'ft' + formatPercent(distanceChangePercent);
+            document.getElementById('distanceDesc').textContent = setupDistance + 'ft → ' + actualDistance + 'ft';
+            document.getElementById('heightScale').textContent =
+                heightScale.toFixed(3) + 'x' + formatPercent(heightScalePercent);
+            document.getElementById('sideScale').textContent =
+                sideScale.toFixed(3) + 'x' + formatPercent(sideScalePercent);
+
+            // Store current values as previous for next comparison
+            previousValues = {
+                distanceChange: distanceChange,
+                heightScale: heightScale,
+                sideScale: sideScale
+            };
+
+            // Debug: Log what we're updating
+            console.log('Updated display:', {
+                distanceChange: distanceChange.toFixed(1) + 'ft',
+                distanceDesc: setupDistance + 'ft → ' + actualDistance + 'ft',
+                heightScale: heightScale.toFixed(3) + 'x',
+                sideScale: sideScale.toFixed(3) + 'x',
+                percentChanges: {
+                    distance: distanceChangePercent.toFixed(1) + '%',
+                    height: heightScalePercent.toFixed(1) + '%',
+                    side: sideScalePercent.toFixed(1) + '%'
+                }
+            });
+        }
+
+        // Refresh summary with visual feedback
+        function refreshSummaryWithFeedback() {
+            const button = document.querySelector('.summary-refresh-btn');
+            const originalText = button.innerHTML;
+
+            // Show loading state
+            button.innerHTML = `
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 6px; animation: spin 1s linear infinite;">
+                    <polyline points="23 4 23 10 17 10"/>
+                    <polyline points="1 20 1 14 7 14"/>
+                    <path d="m3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+                </svg>
+                Refreshing...
+            `;
+
+            // Update the summary
+            updateAdjustmentSummary();
+
+            // Show success state
+            setTimeout(() => {
+                button.innerHTML = `
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 6px;">
+                        <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                    Updated!
+                `;
+                button.style.backgroundColor = '#10b981';
+                button.style.color = 'white';
+
+                // Reset after 1.5 seconds
+                setTimeout(() => {
+                    button.innerHTML = originalText;
+                    button.style.backgroundColor = '#f3f4f6';
+                    button.style.color = '#374151';
+                }, 1500);
+            }, 500);
+        }
+
+        // Calculate adjustment button function
+        function calculateAdjustment() {
+            // Validate all required fields
+            const setupDistance = parseFloat(document.getElementById('setupDistance').value);
+            const actualDistance = parseFloat(document.getElementById('actualDistance').value);
+            const setupSide = parseFloat(document.getElementById('setupSide').value);
+            const actualSide = parseFloat(document.getElementById('actualSide').value);
+            const setupHeight = parseFloat(document.getElementById('setupHeight').value);
+            const actualHeight = parseFloat(document.getElementById('actualHeight').value);
+
+            if (isNaN(setupDistance) || isNaN(actualDistance) || isNaN(setupSide) ||
+                isNaN(actualSide) || isNaN(setupHeight) || isNaN(actualHeight)) {
+                alert('Please fill in all required fields with valid numbers.');
+                return;
+            }
+
+            if (setupDistance <= 0 || actualDistance <= 0) {
+                alert('Distance values must be greater than 0.');
+                return;
+            }
+
+            // Update the adjustment summary
+            updateAdjustmentSummary();
+
+            // If we have CSV data, recalculate corrections
+            if (csvData.length > 0) {
+                updateCalculations();
+            }
+
+            // Show success message
+            showStatus('Adjustment calculated successfully! Upload a CSV file to see corrected values.', 'success');
+        }
+
+        // Update calculations when parameters change
+        function updateCalculations() {
+            const setupDistance = parseFloat(document.getElementById('setupDistance').value) || 13;
+            const actualDistance = parseFloat(document.getElementById('actualDistance').value) || 25;
+            const setupSide = parseFloat(document.getElementById('setupSide').value) || 2.5;
+            const actualSide = parseFloat(document.getElementById('actualSide').value) || -3.5;
+            const setupHeight = parseFloat(document.getElementById('setupHeight').value) || 8.5;
+            const actualHeight = parseFloat(document.getElementById('actualHeight').value) || 9;
+
+            // Calculate dynamic correction factors
+            const distanceRatio = actualDistance / setupDistance;
+            const heightDifference = actualHeight - setupHeight;
+            const sideDifference = actualSide - setupSide;
+
+            // Reference case: 13ft → 25ft (ratio 1.923), height +0.5ft, side -6ft
+            const referenceDistanceRatio = 25 / 13; // 1.923
+
+            // Reference correction factors from the 13ft→25ft calibration study
+            const referenceFactors = {
+                height: { scale: 1.082, avgCorrect: 2.317, avgMiscal: 2.415 },
+                side: { scale: 0.982, avgCorrect: 0.058, avgMiscal: -0.125 }
+            };
+
+            // Calculate dynamic correction factors based on user's setup vs reference
+            const distanceScaling = distanceRatio / referenceDistanceRatio;
+
+            // Interpolate/extrapolate correction factors based on setup differences
+            const heightScaleAdjustment = 1 + (distanceScaling - 1) * 0.5; // Moderate scaling with distance
+            const sideScaleAdjustment = 1 + (distanceScaling - 1) * 0.3;   // Less scaling for side measurements
+
+            const correctionFactors = {
+                height: {
+                    scale: referenceFactors.height.scale * heightScaleAdjustment,
+                    avgCorrect: referenceFactors.height.avgCorrect + (heightDifference * 0.1),
+                    avgMiscal: referenceFactors.height.avgMiscal + (heightDifference * 0.1)
+                },
+                side: {
+                    scale: referenceFactors.side.scale * sideScaleAdjustment,
+                    avgCorrect: referenceFactors.side.avgCorrect + (sideDifference * 0.05),
+                    avgMiscal: referenceFactors.side.avgMiscal + (sideDifference * 0.05)
+                }
+            };
+
+            // Update summary display
+            const distanceChange = actualDistance - setupDistance;
+            document.getElementById('distanceChange').textContent = (distanceChange >= 0 ? '+' : '') + distanceChange.toFixed(1) + 'ft';
+            document.getElementById('distanceDesc').textContent = setupDistance + 'ft → ' + actualDistance + 'ft';
+            document.getElementById('heightScale').textContent = correctionFactors.height.scale.toFixed(3) + 'x';
+            document.getElementById('sideScale').textContent = correctionFactors.side.scale.toFixed(3) + 'x';
+
+            // Recalculate corrections if we have data
+            if (csvData.length > 0) {
+                calculateCorrections(correctionFactors);
+            }
+        }
+
+        // Calculate corrections using statistical distribution matching
+        function calculateCorrections(correctionFactors) {
+            const correctedHeightValues = [];
+            const correctedSideValues = [];
+
+            csvData.forEach(row => {
+                // Handle height correction using statistical distribution matching
+                if (row.height === '' || row.height === null || row.height === undefined) {
+                    correctedHeightValues.push('');
+                } else {
+                    const originalHeight = parseFloat(row.height);
+                    if (isNaN(originalHeight)) {
+                        correctedHeightValues.push(row.height); // Keep non-numeric values unchanged
+                    } else {
+                        // Statistical correction: (original - miscalAvg) * scale + correctAvg
+                        const correctedHeight = (originalHeight - correctionFactors.height.avgMiscal) *
+                                               correctionFactors.height.scale +
+                                               correctionFactors.height.avgCorrect;
+                        correctedHeightValues.push(correctedHeight.toFixed(6));
+                    }
+                }
+
+                // Handle side correction using statistical distribution matching
+                if (row.side === '' || row.side === null || row.side === undefined) {
+                    correctedSideValues.push('');
+                } else {
+                    const originalSide = parseFloat(row.side);
+                    if (isNaN(originalSide)) {
+                        correctedSideValues.push(row.side); // Keep non-numeric values unchanged
+                    } else {
+                        // Statistical correction: (original - miscalAvg) * scale + correctAvg
+                        const correctedSide = (originalSide - correctionFactors.side.avgMiscal) *
+                                             correctionFactors.side.scale +
+                                             correctionFactors.side.avgCorrect;
+                        correctedSideValues.push(correctedSide.toFixed(6));
+                    }
+                }
+            });
+
+            correctedHeights = correctedHeightValues.join('\n');
+            correctedSides = correctedSideValues.join('\n');
+
+            // Update display
+            document.getElementById('correctedHeights').value = correctedHeights;
+            document.getElementById('correctedSides').value = correctedSides;
+            document.getElementById('heightCount').textContent = correctedHeightValues.filter(v => v.trim() !== '').length + ' values';
+            document.getElementById('sideCount').textContent = correctedSideValues.filter(v => v.trim() !== '').length + ' values';
+            document.getElementById('dataSummary').textContent = `Processed ${csvData.length} rows with 6 decimal precision.`;
+
+            // Show results section
+            document.getElementById('resultsSection').classList.remove('hidden');
+        }
+
+        // Setup drag and drop functionality
+        function setupDragAndDrop() {
+            const uploadArea = document.getElementById('uploadArea');
+
+            uploadArea.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
+
+            uploadArea.addEventListener('dragleave', function(e) {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+            });
+
+            uploadArea.addEventListener('drop', function(e) {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    handleFile(files[0]);
+                }
+            });
+        }
+
+        // Handle file upload
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                handleFile(file);
+            }
+        }
+
+        // Process uploaded file
+        async function handleFile(file) {
+            if (!file.name.toLowerCase().endsWith('.csv')) {
+                showStatus('Please select a CSV file.', 'error');
+                return;
+            }
+
+            document.getElementById('uploadBtn').textContent = 'Processing...';
+            document.getElementById('uploadBtn').disabled = true;
+
+            try {
+                const text = await file.text();
+                const lines = text.split('\n').filter(line => line.trim() !== '');
+
+                if (lines.length === 0) {
+                    showStatus('The CSV file appears to be empty.', 'error');
+                    return;
+                }
+
+                // Find header row and column indices
+                const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+
+                let heightColumnIndex = -1;
+                let sideColumnIndex = -1;
+
+                // Search for columns containing "plateloche" and "platelocsi" (case-insensitive)
+                headers.forEach((header, index) => {
+                    if (header.includes('plateloche')) {
+                        heightColumnIndex = index;
+                    }
+                    if (header.includes('platelocsi')) {
+                        sideColumnIndex = index;
+                    }
+                });
+
+                if (heightColumnIndex === -1 || sideColumnIndex === -1) {
+                    showStatus('Could not find required columns. Please ensure your CSV contains columns with "PlateLocHeight" and "PlateLocSide" in their names.', 'error');
+                    return;
+                }
+
+                // Parse data rows
+                const dataRows = lines.slice(1); // Skip header row
+                csvData = dataRows.map(line => {
+                    const columns = line.split(',');
+                    return {
+                        height: columns[heightColumnIndex]?.trim() || '',
+                        side: columns[sideColumnIndex]?.trim() || ''
+                    };
+                });
+
+                showStatus(`Successfully loaded: ${file.name}`, 'success');
+                updateCalculations(); // This will trigger calculateCorrections
+
+            } catch (err) {
+                showStatus('Error reading file. Please ensure it is a valid CSV file.', 'error');
+                console.error('File parsing error:', err);
+            } finally {
+                document.getElementById('uploadBtn').textContent = 'Select CSV File';
+                document.getElementById('uploadBtn').disabled = false;
+            }
+        }
+
+        // Show status message
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('fileStatus');
+            statusDiv.className = `status-message status-${type}`;
+            statusDiv.innerHTML = `
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 8px;">
+                    ${type === 'success' ?
+                        '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>' :
+                        '<circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>'
+                    }
+                </svg>
+                ${message}
+            `;
+            statusDiv.classList.remove('hidden');
+        }
+
+        // Copy to clipboard functionality
+        async function copyToClipboard(textareaId, buttonId) {
+            const textarea = document.getElementById(textareaId);
+            const button = document.getElementById(buttonId);
+            const text = textarea.value;
+
+            try {
+                await navigator.clipboard.writeText(text);
+
+                // Update button to show success
+                button.classList.add('copied');
+                button.innerHTML = `
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 8px;">
+                        <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                    Copied!
+                `;
+
+                // Reset button after 2 seconds
+                setTimeout(() => {
+                    button.classList.remove('copied');
+                    button.innerHTML = `
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 8px;">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                        </svg>
+                        Copy
+                    `;
+                }, 2000);
+
+            } catch (err) {
+                console.error('Failed to copy to clipboard:', err);
+                // Fallback for browsers that don't support clipboard API
+                textarea.select();
+                try {
+                    document.execCommand('copy');
+                    // Same success feedback as above
+                    button.classList.add('copied');
+                    button.innerHTML = `
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 8px;">
+                            <polyline points="20 6 9 17 4 12"/>
+                        </svg>
+                        Copied!
+                    `;
+                    setTimeout(() => {
+                        button.classList.remove('copied');
+                        button.innerHTML = `
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 8px;">
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                            </svg>
+                            Copy
+                        `;
+                    }, 2000);
+                } catch (fallbackErr) {
+                    console.error('Fallback copy failed:', fallbackErr);
+                }
+            }
+        }
+    </script>
+</body>
+</html>
